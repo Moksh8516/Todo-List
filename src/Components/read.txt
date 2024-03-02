@@ -1,0 +1,212 @@
+             =================================
+
+// Create a Folder in the name of Context
+// 1. Get the context from the Todo.js
+
+ import {createContext, useContext} from 'react';
+ 
+ export const  TodoContext = createContext([
+  todos:{
+    id: 1,
+    title: 'Todo Message',
+    complete: false
+  }],
+  addTodo : (title)=>{},
+  removeTodo : (id)=>{},
+  updateTodo : (title, id)=>{},
+  toggleTodo : (id)=>{},
+ );
+
+ export const TodoProvider = TodoContext.Provider;
+
+ export const useTodo function () {
+  return  useContext(TodoContext);
+ }
+
+               =================================
+ // Go to the Src Folder
+ // Get the App.jsx file
+
+import  React ,{useState, useEffect} from "react";
+import TodoProvider from '../Context/Todo.js';
+import  components files
+
+function App () {
+  const [todos, setTodos]= useState([]);
+
+  const addTodo = (title)=>{
+    setTodos((prev)=>[
+      {id: Date.now(), ...title}, ...prev
+    ])
+  }
+
+  const updateTodo = (title, id) =>{
+    setTodos((prevItems)={
+       return prevItems.map((Items)=>{
+        Items.id === id ? title = Items
+      })
+    })
+  }
+
+const removeTodo = (id) =>{
+  setTodos((prev)=> prev.filter((items)=>(items.id!==id)))
+}
+
+const toggleTodo = (id) =>{
+  setTodos((prev)=>prev.map((item)=> items.id === id ? {...prev, complete : !items.complete}: item))
+}
+
+useEffect(()=>{
+ const TodoKey = JSON.parsm(localStorage.getItem("TodoKey"));
+  if (TodoKey && TodoKey.length>0){
+    setTodos(TodoKey)
+  }
+},[])
+
+useEffect(()=>{
+localStorage.setItems('TodoKey', JSON.stringify(todos));
+}[todos])
+
+return(
+  <TodoProvider value={todos, addTodo, removeTodo, updateTodo, toggleTodo}>
+     <h1 className='bg-red-200 text-center font-bold p-3 rounded-md'>Hello Todo</h1>
+      <div className="bg-[#172842] min-h-screen py-8">
+        <div className="w-full max-w-2xl bg-[#172c4a] mx-auto shadow-md rounded-lg px-4 py-3 text-white">
+          <h1 className="text-2xl font-bold text-center mb-8 mt-2">Manage Your Todos</h1>
+          <div className="mb-4">
+            {/* Todo form goes here */}
+            <TodoForm />
+          </div>
+          <div className="flex flex-wrap gap-y-3">
+            {/*Loop and Add TodoItem here */}
+            {todos.map((todo) => {
+              if (!todo) {
+                console.error('Invalid todo object passed to TodoItem');
+                return null;
+              }
+
+              return (
+                <div className="w-full" key={todo.id}>
+                  <TodoItem todo={title} />
+                </div>
+              );
+            })}
+
+          </div>
+        </div>
+      </div>
+  </TodoProvider>
+)
+}
+
+export default App;
+
+               =================================
+
+// create a folder of Components
+// Get a file name TodoItems.jsx
+
+import useTodo from '../Context/Todo.js';
+import useState from 'react';
+
+function TodoItem({ todo }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [todoMsg, setTodoMsg] = useState(todo.title);
+  const { updateTodo, removeTodo, toggleBtn } = useTodo();
+
+  const editTodo = () => {
+    updateTodo(todo.id, { ...todo, todo: todoMsg })
+    setIsEditing(false)
+  }
+
+  const toggleClick = () => {
+    toggleBtn(todo.id)
+  }
+
+  return (
+    <div
+      className={`flex border border-black/10 rounded-lg px-3 py-1.5 gap-x-3 shadow-sm shadow-white/50 duration-300  text-black ${todo.complete ? "bg-[#c6e9a7]" : "bg-[#ccbed7]"
+        }`}
+    >
+
+      <input
+        type="checkbox"
+        className="cursor-pointer"
+        checked={todo.complete}
+        onChange={toggleClick}
+      />
+
+      <input
+        type="text"
+        className={`border outline-none w-full bg-transparent rounded-lg ${isEditing ? "border-black/10 px-2" : "border-transparent"
+          } ${todo.complete ? "line-through" : ""}`}
+        value={todoMsg}
+        onChange={(e) => setTodoMsg(e.target.value)}
+        readOnly={!isEditing}
+      />
+
+      {/* Edit, Save Button */}
+      <button
+        className="inline-flex w-8 h-8 rounded-lg text-sm border border-black/10 justify-center items-center bg-gray-50 hover:bg-gray-100 shrink-0 disabled:opacity-50"
+        onClick={() => {
+          if (todo.complete) return;
+
+          if (isEditing) {
+            editTodo();
+          } else setIsEditing((prev) => !prev);
+        }}
+        disabled={todo.complete}
+      >
+        {isEditing ? "📁" : "✏️"}
+      </button>
+      {/* Delete Todo Button */}
+      <button
+        className="inline-flex w-8 h-8 rounded-lg text-sm border border-black/10 justify-center items-center bg-gray-50 hover:bg-gray-100 shrink-0"
+        onClick={() => removeTodo(todo.id)}
+      >
+        ❌
+      </button>
+    </div>
+  );
+}
+
+export default TodoItem;
+
+                  =================================
+
+// Get on TodoForm.jsx file
+
+import { useState } from "react";
+import useTodo from "../Context/Todo";
+function TodoForm() {
+
+  const [todo, setTodo] = useState('');
+  const { addTodo } = useTodo();
+
+  const add = (e) => {
+    e.preventDefault();
+    if (!todo) return
+
+    addTodo({ todo, complete: false });
+    setTodo("");
+  }
+
+  return (
+    <form onSubmit={add} className="flex">
+      <input
+        type="text"
+        placeholder="Write Todo..."
+        className="w-full border border-black/10 rounded-l-lg px-3 outline-none duration-150 bg-white/20 py-2"
+        value={todo}
+        onChange={(e) => setTodo(e.target.value)}
+      />
+      <button type="submit" className="rounded-r-lg px-3 py-1 bg-green-600 text-white shrink-0">
+        Add
+      </button>
+    </form>
+  );
+}
+
+export default TodoForm;
+
+
